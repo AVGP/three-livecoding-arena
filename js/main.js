@@ -5,6 +5,8 @@ var THREE = require('three'),
 
 //    OBJMTLLoader = require('./OBJMTLLoader');
 
+var EDITOR_INITIAL_POS = new THREE.Vector3(0, 10, -50);
+
 var cssRenderer = new CSS3D.Renderer(),
 cssScene    = new THREE.Scene();
 
@@ -18,7 +20,7 @@ var editorElem = document.createElement("textarea"),
     editor3d = new CSS3D.Object3D(editorElem);
 
 editorElem.id = "editor";
-editorElem.textContent = "// Setup your scene here\n\nonRender = function() {\n\t// Updates to the scene go here\n};";
+editorElem.textContent = "// Setup your scene here\n\nonRender = function() {\n  // Updates to the scene go here\n};";
 editorElem.style.backgroundColor = "white";
 editorElem.style.width  = "500px";
 editorElem.style.height = "300px";
@@ -34,10 +36,15 @@ window.addEventListener('keyup', function(e) {
       e.preventDefault();
       break;
     case 84: // "T"
+      if(e.ctrlKey) {
+        Animation.animate(editor3d, editor3d.position, {x: 0, y: 0, z: 0});
+        break;
+      }
+
       if(editor3d.userData.enabled) {
         Animation.animate(editor3d, {x: -400, y: -15, z: -50}, {x: 0, y: 115, z: 0});
       } else {
-        Animation.animate(editor3d, {x: -140, y: -15, z: -50}, {x: 0, y: 45, z: 0});
+        Animation.animate(editor3d, EDITOR_INITIAL_POS, {x: 0, y: 0, z: 0});
       }
       editor3d.userData.enabled = !editor3d.userData.enabled;
       e.preventDefault();
@@ -45,8 +52,7 @@ window.addEventListener('keyup', function(e) {
   }
 });
 
-editor3d.position.set(-140, -15, -50);
-editor3d.rotation.y = Math.PI/4;
+editor3d.position.copy(EDITOR_INITIAL_POS);
 editor3d.userData.enabled = true;
 cssScene.add(editor3d);
 
