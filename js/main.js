@@ -1,0 +1,82 @@
+var THREE = require('three'),
+    World = require('three-world'),
+    CSS3D = require('./css3d'),
+    Animation = require('./animation');
+
+//    OBJMTLLoader = require('./OBJMTLLoader');
+
+var cssRenderer = new CSS3D.Renderer(),
+cssScene    = new THREE.Scene();
+
+cssRenderer.setSize( window.innerWidth, window.innerHeight );
+cssRenderer.domElement.style.position = 'absolute';
+cssRenderer.domElement.style.top = 0;
+document.body.appendChild(cssRenderer.domElement);
+
+// Adding the editor
+var editorElem = document.createElement("textarea"),
+    editor3d = new CSS3D.Object3D(editorElem);
+
+editorElem.id = "editor";
+editorElem.textContent = "// Setup your scene here\n\nonRender = function() {\n\t// Updates to the scene go here\n};";
+editorElem.style.backgroundColor = "white";
+editorElem.style.width  = "500px";
+editorElem.style.height = "300px";
+editorElem.style.opacity = "0.8";
+
+window.addEventListener('keyup', function(e) {
+  if(!e.altKey) return;
+
+  switch(e.keyCode) {
+    case 13: // Return key
+      clearScene();
+      runCode();
+      e.preventDefault();
+      break;
+    case 84: // "T"
+      if(editor3d.userData.enabled) {
+        Animation.animate(editor3d, {x: -400, y: -15, z: -50}, {x: 0, y: 115, z: 0});
+      } else {
+        Animation.animate(editor3d, {x: -140, y: -15, z: -50}, {x: 0, y: 45, z: 0});
+      }
+      editor3d.userData.enabled = !editor3d.userData.enabled;
+      e.preventDefault();
+      break;
+  }
+});
+
+editor3d.position.set(-140, -15, -50);
+editor3d.rotation.y = Math.PI/4;
+editor3d.userData.enabled = true;
+cssScene.add(editor3d);
+
+function clearScene() {
+  var scene = World.getScene();
+  for(var i=0; i<scene.children.length;i++) scene.remove(scene.children[i]);
+}
+
+World.init({camDistance: 500, renderCallback: render});
+
+//var loader = new OBJMTLLoader();
+
+var onRender = null;
+
+function runCode() {
+  var scene  = World,
+      camera = World.getCamera();
+
+  clearScene();
+  eval(editorElem.value);
+}
+
+
+function render() {
+  cssRenderer.render(cssScene, World.getCamera());
+  if(onRender) {
+    onRender();
+  }
+  Animation.update();
+}
+
+World.start();
+console.log("Ready");
