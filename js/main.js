@@ -1,9 +1,10 @@
 var THREE = require('three'),
     World = require('three-world'),
     CSS3D = require('./css3d'),
-    Animation = require('./animation');
-
-//    OBJMTLLoader = require('./OBJMTLLoader');
+    Animation = require('./animation'),
+    OBJLoader = require('./objloader'),
+    OBJMTLLoader = require('./objmtlloader'),
+    WebcamTexture = require('./webcam-texture');
 
 var EDITOR_INITIAL_POS = new THREE.Vector3(0, 10, -50);
 
